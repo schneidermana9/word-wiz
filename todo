@@ -1,0 +1,32 @@
+-save selection text
+-clean selection text to be just one word (whitespace separated?) DONE (probably haha)
+-dictionary api
+-website
+-export to quizlet?
+
+dictionary api:
+https://www.dictionaryapi.com/api/v3/references/collegiate/json/word?key=your-api-key
+
+https://dictionaryapi.com/products/json
+
+//let definition = await findDefinition(word); there was something about if (definition) lol
+//chrome.storage.sync.set({ word: word }, () => console.log(text + ' was set as' + word));
+
+/_
+async function findDefinition(word) {
+const url = 'https://api.dictionaryapi.dev/api/v2/entries/en/';
+let endpoint = `${url}${word}`;
+try {
+const response = await fetch(endpoint);
+if (response.ok) {
+const jsonResponse = await response.json();
+const objResponse = JSON.parse(jsonResponse);
+return objResponse.meanings.definitions.definition;
+}
+throw new Error('Request Failed!');
+} catch (error) {
+console.log(error);
+return '';
+}
+}
+_/
