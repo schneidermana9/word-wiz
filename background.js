@@ -6,21 +6,22 @@ chrome.runtime.onInstalled.addListener(() => {
   });
 
   chrome.contextMenus.onClicked.addListener((info) => {
-    try {
-      if (info.selectionText) {
-        let text = cleanText(info.selectionText);
-        for (let wordIdx in text) {
-          console.log(text[wordIdx]);
-          let definition = findDefinition(text[wordIdx]);
-          console.log(definition);
-          chrome.storage.sync.set({ word: text[wordIdx] }, () => console.log(wordIdx + ' was set as ' + text[wordIdx]));
-        }
-      }
-    } catch (error) {
-      console.log(error);
-    }
+    setDefinition(info.selectionText)
   });
 });
+
+async function setDefinition(uncleanText) {
+  try {
+    let text = cleanText(uncleanText);
+    for (let wordIdx in text) {
+      let word = text[wordIdx];
+      let definition = await findDefinition(text[wordIdx]).then();
+      chrome.storage.sync.set({ word:definition }, () => console.log(word + ' was set as ' + definition));
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 function cleanText(text) {
   const regex = /[\.,-\/#!$%\^&\*;:{}=\-_`~()@\+\?><\[\]\+]/g;
@@ -35,15 +36,10 @@ async function findDefinition(word) {
   let endpoint = `${url}${word}`;
   try {
     const response = await fetch(endpoint);
-    console.log(response);
     if (response.ok) {
       return await response.json().then((obj) => {
-        //current issue: response.body is locked ReadableStream
-        console.log(response.body);
-        return obj.body;
-        //obj.body.meanings.definitions.definition;
+        return obj[0].meanings[0].definitions[0].definition;
       });
-      return jsonResponse;
     }
     throw new Error('Request Failed!');
   } catch (error) {
