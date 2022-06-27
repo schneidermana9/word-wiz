@@ -8,6 +8,9 @@ chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.onClicked.addListener((info) => {
     setDefinition(info.selectionText)
   });
+
+  chrome.storage.sync.set({"words": []}, () => console.log("words list created"));
+  chrome.storage.sync.set({"definitions": []}, () => console.log("definitions list created"));
 });
 
 async function setDefinition(uncleanText) {
@@ -16,7 +19,8 @@ async function setDefinition(uncleanText) {
     for (let wordIdx in text) {
       let word = text[wordIdx];
       let definition = await findDefinition(text[wordIdx]).then();
-      chrome.storage.sync.set({ word:definition }, () => console.log(word + ' was set as ' + definition));
+      chrome.storage.sync.get("words", (result) => result.words.push(word));
+      chrome.storage.sync.get("definitions", (result) => result.definitions.push(definition));
     }
   } catch (error) {
     console.log(error);
