@@ -8,9 +8,13 @@ chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.onClicked.addListener((info) => {
     setDefinition(info.selectionText)
   });
-
-  chrome.storage.sync.set({"words": []}, () => console.log("words list created"));
-  chrome.storage.sync.set({"definitions": []}, () => console.log("definitions list created"));
+  /*
+  future refactor: cleaner to make a class where it has a word + a definition
+   */
+  chrome.storage.sync.set({"dicts": {
+      words: [],
+      definitions: []
+    }}, () => console.log("object created"));
 });
 
 async function setDefinition(uncleanText) {
@@ -19,8 +23,14 @@ async function setDefinition(uncleanText) {
     for (let wordIdx in text) {
       let word = text[wordIdx];
       let definition = await findDefinition(text[wordIdx]).then();
-      chrome.storage.sync.get("words", (result) => result.words.push(word));
-      chrome.storage.sync.get("definitions", (result) => result.definitions.push(definition));
+      chrome.storage.sync.get((result) => {
+        result.dicts.words.push(word);
+        result.dicts.definitions.push(definition)
+        console.log(result.dicts);
+        /*
+        it's only saving one word at a time :(
+         */
+      });
     }
   } catch (error) {
     console.log(error);
