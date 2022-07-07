@@ -11,7 +11,7 @@ chrome.runtime.onInstalled.addListener(() => {
   /*
   future refactor: cleaner to make a class where it has a word + a definition
    */
-  chrome.storage.sync.set({"dicts": {
+  chrome.storage.local.set({"dicts": {
       words: [],
       definitions: []
     }}, () => console.log("object created"));
@@ -23,13 +23,9 @@ async function setDefinition(uncleanText) {
     for (let wordIdx in text) {
       let word = text[wordIdx];
       let definition = await findDefinition(text[wordIdx]).then();
-      chrome.storage.sync.get((result) => {
+      chrome.storage.local.get((result) => {
         result.dicts.words.push(word);
         result.dicts.definitions.push(definition)
-        console.log(result.dicts);
-        /*
-        it's only saving one word at a time :(
-         */
       });
     }
   } catch (error) {

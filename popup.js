@@ -1,7 +1,10 @@
 
 window.onload = (async () => {
-  let replacementText = await chrome.storage.sync.get("words", (result) => console.log(result.words));
-  document.getElementById("words").innerHTML = replacementText;
+  await chrome.storage.local.get((result) => {
+    console.log(result.dicts)
+    document.getElementById("words").innerHTML = result.dicts.words + "\n" + result.dicts.definitions
+  });
+
 })
 
 
