@@ -8,25 +8,21 @@ chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.onClicked.addListener((info) => {
     setDefinition(info.selectionText)
   });
-  /*
-  future refactor: cleaner to make a class where it has a word + a definition
-   */
-  chrome.storage.local.set({"dicts": {
-      words: [],
-      definitions: []
-    }}, () => console.log("object created"));
 });
+
+let newWords = [];
+let newDefs = [];
 
 async function setDefinition(uncleanText) {
   try {
     let text = cleanText(uncleanText);
     for (let wordIdx in text) {
       let word = text[wordIdx];
+      newWords.push(word);
       let definition = await findDefinition(text[wordIdx]).then();
-      chrome.storage.local.get((result) => {
-        result.dicts.words.push(word);
-        result.dicts.definitions.push(definition)
-      });
+      newDefs.push(definition);
+      chrome.storage.local.set({words: newWords}, ()=> {console.log(newWords)} )
+      chrome.storage.local.set({definitions: newDefs}, ()=> {console.log(newDefs)})
     }
   } catch (error) {
     console.log(error);

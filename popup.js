@@ -1,8 +1,9 @@
 
 window.onload = (async () => {
   await chrome.storage.local.get((result) => {
-    console.log(result.dicts)
-    document.getElementById("words").innerHTML = result.dicts.words + "\n" + result.dicts.definitions
+    console.log(result)
+    //document.getElementById("words").innerHTML = result;
+    document.getElementById("words").innerHTML = result.words + "\n" + result.definitions
   });
 
 })
